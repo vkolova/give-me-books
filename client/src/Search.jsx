@@ -1,17 +1,61 @@
 import React from 'react';
+import axios from 'axios';
+
+import Loading from './Loading';
 
 class Search extends React.Component {
     state = {
-        url: ''
+        url: '',
+        error: false,
+        isLoading: false
+    }
+
+    updateSearchCriteria = e => {
+        this.setState({ url: e.target.value });
+    }
+
+    getBookData = () => {
+        this.setState({ isLoading: true });
+        axios.get('http://localhost:8000/preview', {
+            params: {
+                url: this.state.url
+            }
+        })
+        .then(({ data }) => {
+            this.props.app.setState({ book: data });
+        })
+        .catch(err => {
+            this.setState({ error: true });
+        })
+        .then(() => this.setState({ isLoading: false }))
     }
 
     render () {
-        return <div className='search'>
-            <div className='field-wrapper'>
-                <input className='field' type='text'/>
+        const { isLoading } = this.state;
+
+        return <React.Fragment>
+            <div className='search'>
+                <input
+                    className='field'
+                    type='text'
+                    onChange={this.updateSearchCriteria}
+                    value={this.state.url}
+                />
+                {
+                    isLoading
+                        ? <div className='btn'><Loading color='white' scale={0.2} /></div>
+                        : <div className='btn' onClick={this.getBookData}>Търси</div>
+                }
+                
             </div>
-            <div className='btn'>Търси</div>
-        </div>
+            {
+                this.state.error
+                ? <div className='error-message'>
+                    О, не! Възникна грешка. Въвел ли си валиден линк?
+                </div>
+                : <div style={{ height: '25px' }}/>
+            }
+        </React.Fragment>
     }
 }
 

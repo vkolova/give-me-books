@@ -1,0 +1,29 @@
+{
+  "name": "scrapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "start": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "nodemonConfig": {
+    "ignore": [
+      "node_modules/**/node_modules",
+      "venv"
+    ],
+    "verbose": true,
+    "exec": "python main.py",
+    "watch": [
+      "**/*.py"
+    ],
+    "ext": "py"
+  }
+}

@@ -1,0 +1,23 @@
+@import '_vars';
+@import '_mixins';
+
+
+.search {
+    @include flex-center;
+    margin-top: 30px;
+    display: inline-flex;
+
+    .field {
+        height: 50px;
+        min-width: 350px;
+        max-width: 75vw;
+        margin-right: 10px;
+        padding: 5px 15px;
+        
+        border: 0;
+        outline: 0;
+
+        box-sizing: border-box;
+        background: #f5f5f5;
+    }
+}

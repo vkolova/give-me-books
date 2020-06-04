@@ -1,0 +1,31 @@
+@import '_vars';
+@import '_mixins';
+
+.books-list {
+    @include flex-list;
+    @include scrollbars(5px, $primary);
+    @include sm {
+        flex: 1;
+    }
+    @include xl {
+        flex: 1;
+        overflow: auto;
+    }
+    padding: 0 15px;
+    margin: 0 50px;
+    max-width: 100%;
+    max-height: 90vh;
+    position: relative;
+    z-index: 1;
+
+    .fade-bottom {
+        height: 150px;
+        width: 100%;
+
+        bottom: 15px;
+        position: fixed;
+        background: linear-gradient(rgba($white, 0), rgba($white, 0.9));
+        pointer-events: none;
+        z-index: 2;
+    }
+}

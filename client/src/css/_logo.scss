@@ -1,0 +1,16 @@
+@import '_vars';
+@import '_mixins';
+
+
+.header {
+    @include flex-list;
+    @include flex-center;
+
+    flex: 1;
+
+    .portal {
+        max-height: 300px;
+        margin: -30px;
+        object-fit: contain;
+    }
+}

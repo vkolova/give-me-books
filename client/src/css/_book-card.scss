@@ -1,0 +1,46 @@
+@import '_vars';
+
+.book-card {
+    @include sm {
+        max-width: 90%;
+    }
+    max-height: 500px;
+    max-width: 75%;
+    margin: 15px 25px;
+
+    display: inline-flex;
+
+    .left {
+        padding-top: 10px;
+        flex: 2;
+
+        img {
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+    }
+
+    .right {
+        padding: 0 15px;
+        flex: 4;
+        flex-direction: column;
+
+        .title {
+            font-size: 34px;
+            font-style: italic;
+            font-weight: 500;
+            display: block;
+        }
+
+        .author {
+            margin-right: 15px;
+            color: rgba($black, 0.7);
+        }
+
+        .blurb {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+    }
+}

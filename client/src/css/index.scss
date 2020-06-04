@@ -1,17 +1,14 @@
+@import '_vars';
+@import '_mixins';
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
-@mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-@mixin black-italic-900 {
-    font-style: italic;
-    font-weight: 900;
-}
 
-$black: #0000;
-$white: #ffff;
-$primary: #f4584c;
+@import '_common';
+@import '_logo';
+@import '_book-card';
+@import '_search-bar';
+@import '_books-list';
+@import '_loading';
+
 
 html,
 body {
@@ -24,100 +21,41 @@ body {
     font-size: 16px;
     font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
 
-    // background: linear-gradient(-45deg, rgba(#a5fbce, 0.15), rgba(#d6e1f1, 0.15));
     background: $white;
 }
 
-#container {
+a,
+a:hover,
+a:visited,
+a:focus,
+a:active {
+    color: #000000;
+    text-decoration: none;
+}
+
+#root {
     @include flex-center;
+    @include sm {
+        @include flex-list;
+    }
+    @include md {
+        @include flex-list;
+    }
+    @include lg {
+        @include flex-row;
+        overflow: hidden;
+    }
+    @include xl {
+        @include flex-row;
+        overflow: hidden;
+    }
     height: 100%;
     width: 100%;
-    flex-direction: column;
+    // @include flex-list;
 }
 
-.portal {
-    max-height: 300px;
-    margin: -30px;
-    margin-top: -30%;
-}
 
-h1 {
-    @include black-italic-900;
-    margin-bottom: 0;
-}
-
-.search {
-    margin-top: 30px;
-    display: inline-flex;
-
-    .field-wrapper {
-        height: 50px;
-        min-width: 350px;
-        max-width: 75vw;
-        margin-right: 10px;
-
-        position: relative;
-    }
-
-    .field {
-        height: 100%;
-        width: 100%;
-        padding: 5px 15px;
-        
-        border: 0;
-        outline: 0;
-
-        box-sizing: border-box;
-        background: #f5f5f5;
-    }
-
-
-    .btn {
-        @include flex-center;
-        height: 50px;
-        width: 150px;
-        color: $white;
-        text-transform: uppercase;
-        background: $primary;
-    }
-}
-
-.book-card {
-    max-height: 500px;
-    max-width: 30vw;
-
-    display: inline-flex;
-
-    .left {
-        padding-top: 10px;
-        flex: 2;
-
-        img {
-            // max-height: 100%;
-            height: auto;
-            max-width: 100%;
-            object-fit: contain;
-        }
-    }
-
-    .right {
-        padding: 0 15px;
-        flex: 4;
-        flex-direction: column;
-
-        .title {
-            font-size: 34px;
-            font-style: italic;
-            font-weight: 500;
-        }
-
-        .author {
-            color: rgba($black, 0.7);
-        }
-
-        .blurb {
-            margin: 15px 0;
-            font-size: 14px;
-        }
-    }
+.main {
+    @include flex-list;
+    flex: 1;
 }

@@ -1,0 +1,4 @@
+beautifulsoup4==4.9.1
+requests==2.23.0
+sanic==20.3.0
+Sanic-Cors==0.10.0.post3

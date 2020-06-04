@@ -1,2 +1,8 @@
 client/node_modules
 client/package-lock.json
+
+scrapper/venv
+scrapper/node_modules
+scrapper/package-lock.json
+*/__pycache__
+*.pyc
