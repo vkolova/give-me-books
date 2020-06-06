@@ -10,7 +10,6 @@ CORS(app)
 
 @app.route("/preview", methods=['GET'])
 async def preview(request):
-    print(request.args['url'][0])
     page = requests.get(request.args['url'][0])
     return json(extract_book_preview(page))
 

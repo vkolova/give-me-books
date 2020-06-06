@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 
 
 def extract_book_preview(page):
-    soup = BeautifulSoup(page.content, 'html.parser')
+    soup = BeautifulSoup(page.text, 'html.parser')
     data = {}
     data['url'] = page.url
     data['title'] = soup.find(id='bookTitle').text.strip()
