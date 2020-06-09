@@ -4,5 +4,7 @@ client/package-lock.json
 scrapper/venv
 scrapper/node_modules
 scrapper/package-lock.json
+scrapper/*.csv
+scrapper/*.sqlite*
 */__pycache__
 *.pyc

@@ -17,6 +17,9 @@
   "nodemonConfig": {
     "ignore": [
       "node_modules/**/node_modules",
+      "*.csv",
+      "*.sqlite",
+      "*.sqlite-*",
       "venv"
     ],
     "verbose": true,

@@ -16,6 +16,7 @@ class Search extends React.Component {
 
     getBookData = () => {
         this.setState({ isLoading: true });
+        this.props.app.setState({ isLoadingRecommendations: true });
         axios.get('http://localhost:8000/preview', {
             params: {
                 url: this.state.url
@@ -28,6 +29,19 @@ class Search extends React.Component {
             this.setState({ error: true });
         })
         .then(() => this.setState({ isLoading: false }))
+
+        axios.get('http://localhost:8000/recommendation', {
+            params: {
+                url: this.state.url
+            }
+        })
+        .then(({ data }) => {
+            this.props.app.setState({ recommendations: data.books });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+        .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
     }
 
     render () {

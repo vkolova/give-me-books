@@ -5,19 +5,19 @@ import Header from './Header';
 import Search from './Search';
 import BookCard from './BookCard';
 import BookResults from './BookResults';
-import Loading from './Loading';
 
 import './css/index.scss';
 
 class App extends React.Component {
     state = {
         book: null,
+        isLoadingRecommendations: false,
         recommendations: []
     }
 
 
     render () {
-        const { book, recommendations, isLoadingBookCard } = this.state;
+        const { book, recommendations, isLoadingBookCard, isLoadingRecommendations } = this.state;
     
         return <React.Fragment>
             <div className='main'>
@@ -26,7 +26,7 @@ class App extends React.Component {
                 { book && <BookCard {...book}/> }
             </div>
             
-            { recommendations.length > 0 && <BookResults books={Array(10).fill().map((_, i) => i + 1)} /> }
+            { (recommendations.length > 0 || isLoadingRecommendations) && <BookResults books={recommendations} loading={isLoadingRecommendations}/> }
         </React.Fragment>
     }
 }

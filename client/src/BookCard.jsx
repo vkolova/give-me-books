@@ -25,7 +25,7 @@ class BookCard extends React.Component {
                         <a className='author' href={authors[an]} target='_blank'>{an}</a>
                     )
                 }
-                <p className='blurb'>{`${blurb.substring(0, 250)}...`}</p>
+                <p className='blurb'>{`${blurb.substring(0, 350)}...`}</p>
             </div>
         </div>
     }

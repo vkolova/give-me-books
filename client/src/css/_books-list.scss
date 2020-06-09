@@ -11,18 +11,30 @@
         flex: 1;
         overflow: auto;
     }
-    padding: 0 15px;
-    margin: 0 50px;
+    @include print {
+        background-color: $white;
+        height: auto;
+        max-height: unset;
+    }
+    height: 100%;
+    max-height: 100vh;
     max-width: 100%;
-    max-height: 90vh;
+    padding: 0 15px;
+
     position: relative;
+    background: #f5f5f5;
+
     z-index: 1;
 
     .fade-bottom {
+        @include print {
+            display: none;
+        }
         height: 150px;
         width: 100%;
 
-        bottom: 15px;
+        bottom: 0;
+        left: 0;
         position: fixed;
         background: linear-gradient(rgba($white, 0), rgba($white, 0.9));
         pointer-events: none;

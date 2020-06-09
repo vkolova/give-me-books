@@ -54,8 +54,22 @@ a:active {
     // @include flex-list;
 }
 
-
 .main {
     @include flex-list;
     flex: 1;
+}
+
+@include print {
+    #root,
+    .main {
+        display: unset;
+        overflow: unset;
+    }
+
+    .main {
+        .book-card .left,
+        .book-card .right .blurb {
+            display: none;
+        }
+    }
 }

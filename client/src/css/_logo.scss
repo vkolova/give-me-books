@@ -5,7 +5,11 @@
 .header {
     @include flex-list;
     @include flex-center;
-
+    @include print {
+        .portal, p {
+            display: none;
+        }
+    }
     flex: 1;
 
     .portal {

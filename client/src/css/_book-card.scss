@@ -4,26 +4,34 @@
     @include sm {
         max-width: 90%;
     }
+    @include print {
+        margin: 0;
+    }
     max-height: 500px;
-    max-width: 75%;
     margin: 15px 25px;
 
     display: inline-flex;
 
     .left {
         padding-top: 10px;
-        flex: 2;
+        // flex: 2;
 
         img {
+            @include print {
+                max-height: 150px;
+            }
             height: auto;
+            max-height: 300px;
             max-width: 100%;
             object-fit: contain;
+
+            border: 1px solid rgba($black, 0.17);
         }
     }
 
     .right {
         padding: 0 15px;
-        flex: 4;
+        flex: 1;
         flex-direction: column;
 
         .title {
