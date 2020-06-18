@@ -2,6 +2,7 @@ client/node_modules
 client/package-lock.json
 
 scrapper/venv
+scrapper/env
 scrapper/node_modules
 scrapper/package-lock.json
 scrapper/*.csv

@@ -35,27 +35,4 @@ def paginate(url: str, pages: int) -> List[str]:
 
 
 def get_book_id(url: str) -> str:
-    # return url.split('-')[0].split('/')[-1].split('.')[0]
     return re.findall(book_id_regex, url)[3][0]
-
-
-def get_proxy_servers():
-    page = requests.get('https://free-proxy-list.net/')
-    soup = BeautifulSoup(page.text, 'lxml')
-    proxies = []
-    for tr in soup.select('#proxylisttable > tbody > tr'):
-        tds = tr.select('td')
-        if tds[6].text == 'yes':
-            proxies.append(f"{tds[0].text}:{tds[1].text}")
-    return proxies
-
-ip_addresses = get_proxy_servers()
-
-def get_proxy():
-    proxy_index = random.randint(0, len(ip_addresses) - 1)
-    proxy = {
-        # "http": ip_addresses[proxy_index],
-        "https": f"https://{ip_addresses[proxy_index]}"
-    }
-    print(f"-- {proxy}")
-    return proxy

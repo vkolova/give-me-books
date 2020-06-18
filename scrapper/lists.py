@@ -51,10 +51,7 @@ async def parse_lists_page(page_url: str, executor: ThreadPoolExecutor) -> List[
         partial(
             requests.get,
             page_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent(),
-                'Referer': 'https://goodreads.com'
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     return parse_list_urls(page.text)
@@ -68,10 +65,7 @@ async def get_lists(lists_page_url: str, executor: ThreadPoolExecutor) -> List[s
         partial(
             requests.get,
             lists_page_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent(),
-                'Referer': 'https://goodreads.com'
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     first_page_lists = parse_list_urls(lists_page.text)
@@ -98,10 +92,7 @@ async def parse_books_from_list(list_url: str, executor: ThreadPoolExecutor) -> 
         partial(
             requests.get,
             list_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent(),
-                'Referer': 'https://goodreads.com'
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     first_page_books = parse_book_urls(page.text)

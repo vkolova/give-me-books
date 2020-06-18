@@ -9,6 +9,7 @@ import csv
 from functools import partial
 import logging
 from datetime import timedelta
+import sqlite3
 
 from typing import List, Dict
 
@@ -63,8 +64,7 @@ async def preview(request):
     page = requests.get(
         request.args['url'][0],
         headers={
-            'User-Agent': user_agent_rotator.get_random_user_agent(),
-            'Referer': 'https://goodreads.com'
+            'User-Agent': user_agent_rotator.get_random_user_agent()
         }
     )
     return json(extract_book_preview(page))
@@ -75,15 +75,19 @@ async def recommendation(request):
     target_url = request.args['url'][0]
     book_id = get_book_id(target_url)
     books = []
-    lists = await gather_lists_urls(f'https://www.goodreads.com/list/book/{book_id}', executor)
-    if lists:
-        books.extend(await gather_books_from_lists(lists[:3], executor))
-    else:
-        shelves = await gather_shelves_urls(f'https://www.goodreads.com/book/shelves/{book_id}', executor)
-        if shelves:
-            books.extend(await gather_books_from_shelves(shelves[:3], executor))
-    books.append(f"/book/show/{target_url.split('/')[-1]}")
-    books = unique(books)
+    try:
+        lists = await gather_lists_urls(f'https://www.goodreads.com/list/book/{book_id}', executor)
+        if lists:
+            books.extend(await gather_books_from_lists(lists[:3], executor))
+        else:
+            shelves = await gather_shelves_urls(f'https://www.goodreads.com/book/shelves/{book_id}', executor)
+            if shelves:
+                books.extend(await gather_books_from_shelves(shelves[:3], executor))
+        books.append(f"/book/show/{target_url.split('/')[-1]}")
+        books = unique(books)
+    except sqlite3.OperationalError:
+        logging.error(f"[MAIN] ", exc_info=True)
+        pass
 
     if len(books) < 2:
         return json({'books': [] })
@@ -104,8 +108,14 @@ async def recommendation(request):
         # similar_items = [(cosine_similarities[idx][i], ds['url'][i]) for i in similar_indices] 
         similar_items = [ds['url'][i] for i in similar_indices] 
         results[row['url']] = similar_items[1:]
+    
+    book_reccomendations = await book_results_preview(results[target_url][:15], executor)
+    import json as p_json
 
-    return json({ 'books': await book_results_preview(results[target_url][:15], executor) })
+    with open("recommendations.json", "w+") as outfile:
+        p_json.dump(book_reccomendations, outfile)
+
+    return json({ 'books': book_reccomendations })
 
 
 

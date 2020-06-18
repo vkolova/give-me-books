@@ -14,15 +14,10 @@
 
     .left {
         padding-top: 10px;
-        // flex: 2;
 
         img {
-            @include print {
-                max-height: 150px;
-            }
             height: auto;
-            max-height: 300px;
-            max-width: 100%;
+            max-width: 150px;
             object-fit: contain;
 
             border: 1px solid rgba($black, 0.17);

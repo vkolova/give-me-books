@@ -44,16 +44,13 @@ async def extract_book_data(book_url: str, executor: ThreadPoolExecutor) -> Dict
         executor,
         partial(requests.get,
             shelves_page_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent(),
-                'Referer': 'https://goodreads.com'
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     soup = BeautifulSoup(page.text, 'lxml', parse_only=shelf_urls_only)
     return {
         'url': book_url,
-        'keywords': ','.join(filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')]) or ['none'])
+        'keywords': ' '.join(filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')]) or ['none'])
     }
 
 
