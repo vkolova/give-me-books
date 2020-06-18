@@ -3,10 +3,28 @@ import axios from 'axios';
 
 import Loading from './Loading';
 
+class Shelf extends React.Component {
+    onClick = () => {
+        this.props.isSelected
+            ? this.props.deselectShelf(this.props.title)
+            : this.props.selectShelf(this.props.title)
+    }
+
+    render () {
+        const { title, isSelected } = this.props;
+        return <div className={`shelf ${isSelected ? 'selected': ''}`} key={title} onClick={this.onClick}>{title}</div>
+    }
+}
+
 class Search extends React.Component {
     state = {
         url: '',
         error: false,
+        sendToEmail: false,
+        email: '',
+        selectShelves: false,
+        allShelves: [],
+        selectedShelves: [],
         isLoading: false
     }
 
@@ -22,30 +40,50 @@ class Search extends React.Component {
                 url: this.state.url
             }
         })
-        .then(({ data }) => {
-            this.props.app.setState({ book: data });
-        })
-        .catch(err => {
-            this.setState({ error: true });
-        })
+        .then(({ data }) => this.props.app.setState({ book: data }))
+        .catch(err => this.setState({ error: true }))
         .then(() => this.setState({ isLoading: false }))
 
         axios.get('http://localhost:8000/recommendation', {
             params: {
-                url: this.state.url
+                url: this.state.url,
+                shelves: this.state.selectedShelves.join(',')
             }
         })
-        .then(({ data }) => {
-            this.props.app.setState({ recommendations: data.books });
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        .then(({ data }) => this.props.app.setState({ recommendations: data.books }))
+        .catch(err =>  console.log(err))
         .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
     }
 
+    loadShelves = () => {
+        axios.get('http://localhost:8000/shelves', {
+            params: {
+                url: this.state.url
+            }
+        })
+        .then(({ data }) => this.setState({ allShelves: data.shelves }))
+        .catch(err => console.log(err))
+    }
+
+    onCheckboxChange = e => {
+        this.setState({ [e.target.name]: e.target.checked });
+        e.target.checked && this.state.url && this.loadShelves();
+    }
+
+    onSelectShelves = e => {
+        this.onCheckboxChange(e);
+    }
+
+    selectShelf = shelf => {
+        this.setState({ selectedShelves: [shelf, ...this.state.selectedShelves] });
+    }
+
+    deselectShelf = shelf => {
+        this.setState({ selectedShelves: this.state.selectedShelves.filter(s => s !== shelf) });
+    }
+
     render () {
-        const { isLoading } = this.state;
+        const { isLoading, sendToEmail, selectShelves } = this.state;
 
         return <React.Fragment>
             <div className='search'>
@@ -55,6 +93,29 @@ class Search extends React.Component {
                     onChange={this.updateSearchCriteria}
                     value={this.state.url}
                 />
+                <div className='search-options'>
+                    {/* <label>
+                        <input type='checkbox' name='sendToEmail' value={sendToEmail} onChange={this.onCheckboxChange} />
+                        Изпрати на мейла ми
+                    </label> */}
+
+                    <label>
+                        <input type='checkbox' name='selectShelves' value={selectShelves} onChange={this.onSelectShelves} />
+                        Искам да избера ключовите категории
+                    </label>
+                </div>
+                <div className='shelves'>
+                    {
+                        this.state.allShelves.map(s =>
+                            <Shelf
+                                title={s}
+                                isSelected={this.state.selectedShelves.includes(s)}
+                                selectShelf={this.selectShelf}
+                                deselectShelf={this.deselectShelf}
+                            />
+                        )
+                    }
+                </div>
                 {
                     isLoading
                         ? <div className='btn'><Loading color='white' scale={0.2} /></div>

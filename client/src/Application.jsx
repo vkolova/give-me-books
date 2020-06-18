@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Header from './Header';
+import Main from './Main';
 import Search from './Search';
 import BookCard from './BookCard';
 import BookResults from './BookResults';
+import Header from './Header';
 
 import './css/index.scss';
 
@@ -20,8 +21,9 @@ class App extends React.Component {
         const { book, recommendations, isLoadingBookCard, isLoadingRecommendations } = this.state;
     
         return <React.Fragment>
+            <Header/>
             <div className='main'>
-                <Header />
+                <Main />
                 { !book && <Search app={this} /> }
                 { book && <BookCard {...book}/> }
             </div>

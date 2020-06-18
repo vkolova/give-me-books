@@ -1,0 +1,24 @@
+@import '_vars';
+@import '_mixins';
+
+.header {
+    @include flex-center;
+
+    top: 0;
+    padding: 0 25px;
+    height: 70px;
+    width: 100%;
+
+    background-color: $white;
+    border-bottom: 1px solid rgba($black, 0.1);
+
+    position: absolute;
+    justify-content: flex-start;
+
+    box-sizing: border-box;
+
+    .portal {
+        max-height: 50px;
+        object-fit: contain;
+    }
+}

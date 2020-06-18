@@ -4,14 +4,13 @@
 
 .search {
     @include flex-center;
+    @include flex-list;
     margin-top: 30px;
-    display: inline-flex;
 
     .field {
         height: 50px;
         min-width: 350px;
-        max-width: 75vw;
-        margin-right: 10px;
+        width: 33vw;
         padding: 5px 15px;
         
         border: 0;
@@ -19,5 +18,55 @@
 
         box-sizing: border-box;
         background: #f5f5f5;
+    }
+}
+
+label {
+    @include flex-center;
+}
+
+.search-options {
+    @include flex-center;
+    min-width: 350px;
+    width: 33vw;
+    margin-top: 10px;
+    margin-bottom: 25px;
+
+    justify-content: space-evenly;
+}
+
+
+.shelves {
+    margin-bottom: 25px;
+    
+    min-width: 350px;
+    width: 75vw;
+
+    text-align: center;
+
+
+    .shelf {
+        margin: 3px 5px;
+        padding: 3px 5px;
+
+        font-size: 11px;
+        text-transform: uppercase;
+
+        display: inline-block;
+
+        color: $white;
+        background-color: rgba($black, 0.7);
+
+        transition: opacity 0.3s ease-in-out;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    .shelf.selected {
+        background-color: $primary;
     }
 }

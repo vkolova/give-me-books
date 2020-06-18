@@ -16,14 +16,17 @@ from utils import paginate, flatten, unique, user_agent_rotator, get_book_id
 shelf_urls_only = SoupStrainer('a', {'class': 'mediumText actionLinkLite'})
 
 filtered_keywords = [
-    'to-read', 'tbr', 'currently-reading', 'favorites', 'to-re-read', 'reread', 're-read', 'own-unread',
-    'dnf', 'did-not-finish',
-    'kindle-unlimited', 'ku', 'audio', 'ebooks'
+    'to-read', 'tbr', 'currently-reading', 'favorites', 'to-re-read', 'reread', 're-read', 'own-unread', 'arc', 'arcs',
+    'dnf', 'did-not-finish', 'nope', 'lost-interest', 'maybe',
+    'kindle-unlimited', 'ku', 'audio', 'ebooks', 'kindle', 'unlimited',
     'wishlist', 'to-buy', 'my-books', 'my-ebooks', 'my-library', 'library', 'owned-books', 'own-it', 'i-own', 'all-time-favorites', 'library',
     'debut', 'novels',
+    'favourites',
+    '5-stars', '4-stars', '3-stars', '2-stars',
     '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020',
     'read-in-2010', 'read-in-2011', 'read-in-2012', 'read-in-2013', 'read-in-2014', 'read-in-2015', 'read-in-2016', 'read-in-2017', 'read-in-2018', 'read-in-2019', 'read-in-2020',
     'read-2010', 'read-2011', 'read-2012', 'read-2013', 'read-2014', 'read-2015', 'read-2016', 'read-2017', 'read-2018', 'read-2019', 'read-2020',
+    '2020-books', '2019-books', '2018-books', '2017-books', '2016-books', '2015-books'
 ]
 
 def filter_out_irrelevant(keywords: List[str]) -> List[str]:

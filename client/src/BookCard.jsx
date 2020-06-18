@@ -12,7 +12,7 @@ class BookCard extends React.Component {
     render () {
         const { url, title, authors, cover, blurb } = this.props.preview ? bookdata : this.props;
 
-        return <div className='book-card'>        
+        return <div className='book-card' key={url}>        
             <div className='left'>
                 <a className='title' href={url} target='_blank'>
                     <img src={cover} />

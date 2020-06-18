@@ -17,7 +17,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 from utils import extract_book_preview, unique, get_book_id, user_agent_rotator
-from book import gather_book_data
+from book import gather_book_data, filter_out_irrelevant
 from lists import gather_lists_urls, gather_books_from_lists
 from shelf import gather_books_from_shelves, gather_shelves_urls
 
@@ -26,7 +26,7 @@ from settings import GOODREADS_URL
 logging.basicConfig(level=logging.DEBUG)
 
 import requests_cache
-expire_after = timedelta(days=1)
+expire_after = timedelta(days=3)
 requests_cache.install_cache('app_cache', expire_after=expire_after)
 
 executor = ThreadPoolExecutor(max_workers=300)
@@ -70,29 +70,46 @@ async def preview(request):
     return json(extract_book_preview(page))
 
 
+@app.route("/shelves", methods=['GET'])
+async def shelves(request):
+    target_url = request.args['url'][0]
+    book_id = get_book_id(target_url)
+    shelves = await gather_shelves_urls(f'https://www.goodreads.com/book/shelves/{book_id}', executor)
+    shelves = [s.split('/')[-1] for s in shelves]
+    return json({ 'shelves': filter_out_irrelevant(shelves) })
+
+
 @app.route("/recommendation", methods=['GET'])
 async def recommendation(request):
     target_url = request.args['url'][0]
+    target_shelves = request.args.get('shelves', None)
     book_id = get_book_id(target_url)
     books = []
     try:
-        lists = await gather_lists_urls(f'https://www.goodreads.com/list/book/{book_id}', executor)
-        if lists:
-            books.extend(await gather_books_from_lists(lists[:3], executor))
+        # lists = await gather_lists_urls(f'https://www.goodreads.com/list/book/{book_id}', executor)
+        # if lists:
+        #     books.extend(await gather_books_from_lists(lists[:3], executor))
+        if target_shelves:
+            shelves = [f"/genres/{s}" for s in target_shelves.split(',')]
         else:
             shelves = await gather_shelves_urls(f'https://www.goodreads.com/book/shelves/{book_id}', executor)
-            if shelves:
-                books.extend(await gather_books_from_shelves(shelves[:3], executor))
-        books.append(f"/book/show/{target_url.split('/')[-1]}")
+        if shelves:
+            books.extend(await gather_books_from_shelves(shelves[:10], executor))
+        # books.append(f"/book/show/{target_url.split('/')[-1]}")
         books = unique(books)
     except sqlite3.OperationalError:
         logging.error(f"[MAIN] ", exc_info=True)
         pass
 
-    if len(books) < 2:
+    if len(books) < 1:
         return json({'books': [] })
 
     book_data = await gather_book_data(books, executor)
+    target_book_data = await gather_book_data([f"/book/show/{target_url.split('/')[-1]}"], executor)
+    target_book_data = target_book_data[0]
+    if target_shelves:
+        target_book_data["keywords"] = ' '.join(target_shelves.split(','))
+    book_data.append(target_book_data)
     df = pd.json_normalize(book_data)
     df.to_csv('results.csv', index=False, encoding='utf-8')
 

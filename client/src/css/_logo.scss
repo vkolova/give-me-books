@@ -2,19 +2,13 @@
 @import '_mixins';
 
 
-.header {
+.main {
     @include flex-list;
     @include flex-center;
     @include print {
-        .portal, p {
+        p {
             display: none;
         }
     }
     flex: 1;
-
-    .portal {
-        max-height: 230px;
-        margin: -40px;
-        object-fit: contain;
-    }
 }
