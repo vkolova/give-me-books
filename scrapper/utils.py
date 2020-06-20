@@ -24,14 +24,19 @@ def corr(s):
 
 def extract_book_preview(page):
     soup = BeautifulSoup(page.text, 'html.parser')
-    data = {}
-    data['url'] = page.url
-    data['title'] = soup.find(id='bookTitle').text.strip()
-    data['authors'] = {a.text.strip(): a.attrs['href'] for a in soup.find_all('a', class_='authorName')}
-    data['rating'] = soup.select('#bookMeta > span:nth-child(2)')[0].text.strip()
-    data['cover'] = soup.find(id='coverImage').attrs['src']
-    data['blurb'] = corr(soup.select('#description span')[0].text)
-    return data
+    series = soup.select('#bookSeries > a')
+    return {
+        'url': page.url,
+        'title': soup.find(id='bookTitle').text.strip(),
+        'series': {
+            'title': series[0].text.strip(),
+            'url': series[0].attrs['href']
+        } if len(series) else None,
+        'authors': {a.text.strip(): a.attrs['href'] for a in soup.find_all('a', class_='authorName')},
+        'rating': soup.select('#bookMeta > span:nth-child(2)')[0].text.strip(),
+        'cover':  soup.find(id='coverImage').attrs['src'],
+        'blurb': corr(soup.select('#description span')[0].text)
+    }
 
 def paginate(url: str, pages: int) -> List[str]:
     return [f"{url}?page={str(p)}" for p in range(2, pages + 1)]

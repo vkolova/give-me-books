@@ -1,7 +1,7 @@
-const webpack = require('webpack')
-const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require('webpack');
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: ['./src/index.jsx'],
@@ -16,7 +16,7 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({
-            filename: "styles.css"
+            filename: 'styles.css'
         })
     ],
     module: {
@@ -53,14 +53,11 @@ module.exports = {
             {
                 test: /\.s[c|a]ss$/,
                 use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
-            },
+            }
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx', '.json'],
-        alias: {
-            '~~': path.resolve(__dirname, 'src')
-        }
+        extensions: ['.js', '.jsx', '.json']
     },
     devServer: {
         contentBase: path.join(__dirname, 'public'),
@@ -69,4 +66,4 @@ module.exports = {
         historyApiFallback: true
     },
     devtool: 'source-map'
-}
+};

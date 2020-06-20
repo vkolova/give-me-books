@@ -1,0 +1,36 @@
+{
+    "extends": [
+      "standard",
+      "standard-jsx",
+      "standard-react"
+    ],
+    "parser": "babel-eslint",
+    "rules": {
+      "indent": ["error", 4],
+      "semi": ["error", "always"],
+      "jsx-quotes": ["error", "prefer-single"],
+      "react/jsx-indent": ["error", 4],
+      "react/jsx-indent-props": [0],
+      "react/jsx-tag-spacing": [0],
+      "react/jsx-curly-spacing": [0, { "when": "always" }],
+      "react/jsx-boolean-value": [0, { "never": ["personal"] }],
+      "react/jsx-fragments": [0, { "never": ["personal"] }],
+      "react/jsx-closing-tag-location":  [0, { "never": ["personal"] }],
+      "react/jsx-handler-names": [0],
+      "react/jsx-closing-bracket-location": [0],
+      "camelcase": [0, { "properties": "never" }],
+      "handle-callback-err": ["error", "never"],
+      "react/prop-types": [2, { "ignore": ["children"] }],
+      "react/display-name": [0]
+    },
+    "plugins": [
+      "react"
+    ],
+    "settings": {
+      "react": {
+        "pragma": "React",
+        "version": "16.13.0"
+      }
+    }
+  }
+  

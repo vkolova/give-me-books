@@ -1,0 +1,18 @@
+{
+    "extends": "stylelint-config-sass-guidelines",
+    "rules": {
+        "indentation": 4,
+        "order/properties-alphabetical-order": null,
+        "order/order": [
+            "at-rules", "custom-properties", "dollar-variables", "declarations", "rules"
+        ],
+        "scss/dollar-variable-pattern": "^[_]?[a-z]+([a-z0-9-]+[a-z0-9]+)?$",
+        "scss/percent-placeholder-pattern": "^[a-z]+([a-z0-9-]+[a-z0-9]+)?$",
+        "scss/at-mixin-pattern": "^[a-z]+([a-z0-9-]+[a-z0-9]+)?$",
+        "color-named": null,
+        "max-nesting-depth": 3,
+        "string-quotes": "single",
+        "selector-max-id": 3,
+        "selector-max-compound-selectors": null
+    }
+}

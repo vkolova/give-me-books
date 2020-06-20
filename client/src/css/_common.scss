@@ -1,5 +1,5 @@
-@import '_vars';
-@import '_mixins';
+@import 'vars';
+@import 'mixins';
 
 
 a,
@@ -7,7 +7,7 @@ a:hover,
 a:visited,
 a:focus,
 a:active {
-    color: #000000;
+    color: #000;
     text-decoration: none;
 }
 

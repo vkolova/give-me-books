@@ -1,15 +1,15 @@
-@import '_vars';
-@import '_mixins';
+@import 'vars';
+@import 'mixins';
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
-@import '_common';
-@import '_logo';
-@import '_book-card';
-@import '_search-bar';
-@import '_books-list';
-@import '_loading';
-@import '_header';
-@import '_footer';
+@import 'common';
+@import 'logo';
+@import 'book-card';
+@import 'search-bar';
+@import 'books-list';
+@import 'loading';
+@import 'header';
+@import 'footer';
 
 
 html,
@@ -31,7 +31,9 @@ body {
     min-height: 100%;
 }
 
-*, :after, :before {
+*,
+::after,
+::before {
     box-sizing: border-box;
 }
 
@@ -75,7 +77,7 @@ body {
     flex-flow: row;
     overflow: hidden;
 
-    & > * {
+    & > * { // stylelint-disable-line
         flex: 1 50%;
     }
 

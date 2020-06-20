@@ -60,9 +60,13 @@ $screen-xl-min: 1200px;
 }
 
 @mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white,  50%)) {
+    // For Internet Explorer
+    scrollbar-face-color: $foreground-color;
+    scrollbar-track-color: $background-color;
+
     // For Google Chrome
     &::-webkit-scrollbar {
-        width:  $size;
+        width: $size;
         height: $size;
     }
 
@@ -74,11 +78,7 @@ $screen-xl-min: 1200px;
         background: linear-gradient(rgba($background-color, 0), rgba($foreground-color, 0.9), rgba($background-color, 0));
     }
 
-    // For Internet Explorer
-    & {
-        scrollbar-face-color: $foreground-color;
-        scrollbar-track-color: $background-color;
-    }
+
 }
 
 @mixin print {

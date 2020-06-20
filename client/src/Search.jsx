@@ -1,24 +1,37 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import Loading from './Loading';
 
 class Shelf extends React.Component {
-    onClick = () => {
+    handleClick = () => {
         this.props.isSelected
             ? this.props.deselectShelf(this.props.title)
-            : this.props.selectShelf(this.props.title)
+            : this.props.selectShelf(this.props.title);
     }
 
     render () {
         const { title, isSelected } = this.props;
-        return <div className={`shelf ${isSelected ? 'selected': ''}`} key={title} onClick={this.onClick}>{title}</div>
+
+        return <div
+            className={`shelf ${isSelected ? 'selected' : ''}`}
+            key={title}
+            onClick={this.handleClick}
+        >{title}</div>;
     }
 }
 
+Shelf.propTypes = {
+    title: PropTypes.string,
+    isSelected: PropTypes.bool,
+    selectShelf: PropTypes.func,
+    deselectShelf: PropTypes.func
+};
+
 class Search extends React.Component {
     state = {
-        url: 'https://www.goodreads.com/book/show/32758410-born-darkly',
+        url: '',
         error: false,
         sendToEmail: false,
         email: '',
@@ -35,25 +48,26 @@ class Search extends React.Component {
     getBookData = () => {
         this.setState({ isLoading: true });
         this.props.app.setState({ isLoadingRecommendations: true });
+
         axios.get('http://localhost:8000/preview', {
             params: {
                 url: this.state.url
             }
         })
-        .then(({ data }) => this.props.app.setState({ book: data }))
-        .catch(err => this.setState({ error: true }))
-        .then(() => this.setState({ isLoading: false }))
+            .then(({ data }) => this.props.app.setState({ book: data }))
+            .catch(err => this.setState({ error: true }))
+            .then(() => this.setState({ isLoading: false }));
 
         axios.get('http://localhost:8000/recommendation', {
             params: {
                 url: this.state.url,
                 shelves: this.state.selectedShelves.join(','),
-                ...(this.state.sendToEmail && this.state.email ? {email: this.state.email} : {})
+                ...(this.state.sendToEmail && this.state.email ? { email: this.state.email } : {})
             }
         })
-        .then(({ data }) => this.props.app.setState({ recommendations: data.books }))
-        .catch(err =>  console.log(err))
-        .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
+            .then(({ data }) => this.props.app.setState({ recommendations: data.books }))
+            .catch(err => console.log(err))
+            .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
     }
 
     loadShelves = () => {
@@ -62,8 +76,8 @@ class Search extends React.Component {
                 url: this.state.url
             }
         })
-        .then(({ data }) => this.setState({ allShelves: data.shelves }))
-        .catch(err => console.log(err))
+            .then(({ data }) => this.setState({ allShelves: data.shelves }))
+            .catch(err => console.log(err));
     }
 
     onCheckboxChange = e => {
@@ -120,6 +134,7 @@ class Search extends React.Component {
                     {
                         this.state.allShelves.map(s =>
                             <Shelf
+                                key={s}
                                 title={s}
                                 isSelected={this.state.selectedShelves.includes(s)}
                                 selectShelf={this.selectShelf}
@@ -133,17 +148,20 @@ class Search extends React.Component {
                         ? <div className='btn'><Loading color='white' scale={0.2} /></div>
                         : <div className='btn' onClick={this.getBookData}>Търси</div>
                 }
-                
             </div>
             {
                 this.state.error
-                ? <div className='error-message'>
-                    О, не! Възникна грешка. Въвел ли си валиден линк?
-                </div>
-                : <div style={{ height: '25px' }}/>
+                    ? <div className='error-message'>
+                        О, не! Възникна грешка. Въвел ли си валиден линк?
+                    </div>
+                    : <div style={{ height: '25px' }}/>
             }
-        </React.Fragment>
+        </React.Fragment>;
     }
 }
+
+Search.propTypes = {
+    app: PropTypes.element
+};
 
 export default Search;
