@@ -3,6 +3,9 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+import requests
+from utils import extract_book_preview
+
 sender_email = os.environ.get("SENDER_EMAIL")
 password = os.environ.get("SENDER_EMAIL_PASS")
 
@@ -40,9 +43,14 @@ def build_email_content(subject: str, recommendations) -> str:
     </html>
     """
 
-def send_recommendations_to_email(search_title, receiver_email, recommendations=[]):
+def send_recommendations_to_email(book_url: str, receiver_email: str, recommendations=[]) -> None:
+    page = requests.get(book_url)
+    book = extract_book_preview(page)
+
+    search_title = f"{book['title']}"
+
     message = MIMEMultipart("alternative")
-    message["Subject"] = f"Предложения за книги, като {search_title}..."
+    message["Subject"] = f"Твоите предложения за книги, като {search_title}..."
     message["From"] = sender_email
     message["To"] = receiver_email
 

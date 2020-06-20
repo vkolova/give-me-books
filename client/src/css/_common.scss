@@ -2,6 +2,15 @@
 @import '_mixins';
 
 
+a,
+a:hover,
+a:visited,
+a:focus,
+a:active {
+    color: #000000;
+    text-decoration: none;
+}
+
 h1 {
     @include black-italic-900;
     margin-bottom: 0;

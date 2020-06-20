@@ -20,6 +20,7 @@ from utils import extract_book_preview, unique, get_book_id, user_agent_rotator
 from book import gather_book_data, filter_out_irrelevant
 from lists import gather_lists_urls, gather_books_from_lists
 from shelf import gather_books_from_shelves, gather_shelves_urls
+from emails import send_recommendations_to_email
 
 from settings import GOODREADS_URL
 
@@ -63,9 +64,7 @@ async def preview(request):
     logging.debug(f"[MAIN] Requesting {request.args['url'][0]}")
     page = requests.get(
         request.args['url'][0],
-        headers={
-            'User-Agent': user_agent_rotator.get_random_user_agent()
-        }
+        headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
     )
     return json(extract_book_preview(page))
 
@@ -83,6 +82,7 @@ async def shelves(request):
 async def recommendation(request):
     target_url = request.args['url'][0]
     target_shelves = request.args.get('shelves', None)
+    email_address = request.args.get('email', None)
     book_id = get_book_id(target_url)
     books = []
     try:
@@ -94,8 +94,7 @@ async def recommendation(request):
         else:
             shelves = await gather_shelves_urls(f'https://www.goodreads.com/book/shelves/{book_id}', executor)
         if shelves:
-            books.extend(await gather_books_from_shelves(shelves[:10], executor))
-        # books.append(f"/book/show/{target_url.split('/')[-1]}")
+            books.extend(await gather_books_from_shelves(shelves[2:5], executor))
         books = unique(books)
     except sqlite3.OperationalError:
         logging.error(f"[MAIN] ", exc_info=True)
@@ -114,7 +113,6 @@ async def recommendation(request):
     df.to_csv('results.csv', index=False, encoding='utf-8')
 
     ds = pd.read_csv("results.csv")
-
     tf = TfidfVectorizer(analyzer='word', ngram_range=(1, 3), min_df=0, stop_words='english')
     tfidf_matrix = tf.fit_transform(ds['keywords'])
 
@@ -122,15 +120,18 @@ async def recommendation(request):
     results = {}
     for idx, row in ds.iterrows():
         similar_indices = cosine_similarities[idx].argsort()[:-100:-1] 
-        # similar_items = [(cosine_similarities[idx][i], ds['url'][i]) for i in similar_indices] 
         similar_items = [ds['url'][i] for i in similar_indices] 
         results[row['url']] = similar_items[1:]
     
-    book_reccomendations = await book_results_preview(results[target_url][:15], executor)
-    import json as p_json
+    recommentations = results[target_url][:11]
+    book_reccomendations = await book_results_preview([r for r in recommentations if r != target_url], executor)
+    # import json as p_json
 
-    with open("recommendations.json", "w+") as outfile:
-        p_json.dump(book_reccomendations, outfile)
+    # with open("recommendations.json", "w+") as outfile:
+    #     p_json.dump(book_reccomendations, outfile)
+
+    if email_address:
+        asyncio.wait(send_recommendations_to_email(target_url, email_address, book_reccomendations))
 
     return json({ 'books': book_reccomendations })
 

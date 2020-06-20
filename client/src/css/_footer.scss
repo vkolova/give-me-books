@@ -1,0 +1,12 @@
+@import '_vars';
+@import '_mixins';
+
+.footer {
+    @include print {
+        display: none;
+    }
+
+    height: 50px;
+    background-color: $white;
+    border-top: 1px solid rgba($black, 0.1);
+}

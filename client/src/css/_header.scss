@@ -3,22 +3,21 @@
 
 .header {
     @include flex-center;
-
-    top: 0;
+    @include print {
+        display: none;
+    }
     padding: 0 25px;
     height: 70px;
-    width: 100%;
 
     background-color: $white;
     border-bottom: 1px solid rgba($black, 0.1);
+    position: relative;
 
-    position: absolute;
     justify-content: flex-start;
 
-    box-sizing: border-box;
-
-    .portal {
-        max-height: 50px;
+    .logo {
+        margin-top: 5px;
+        height: 50px;
         object-fit: contain;
     }
 }

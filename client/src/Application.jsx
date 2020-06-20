@@ -6,6 +6,7 @@ import Search from './Search';
 import BookCard from './BookCard';
 import BookResults from './BookResults';
 import Header from './Header';
+import Footer from './Footer';
 
 import './css/index.scss';
 
@@ -21,14 +22,20 @@ class App extends React.Component {
         const { book, recommendations, isLoadingBookCard, isLoadingRecommendations } = this.state;
     
         return <React.Fragment>
-            <Header/>
-            <div className='main'>
-                <Main />
-                { !book && <Search app={this} /> }
-                { book && <BookCard {...book}/> }
+            <Header />
+            <div className='content-wrapper'>
+                <div className='half main'>
+                    <Main loaded={recommendations.length > 0} />
+                    { !book && <Search app={this} /> }
+                    { book && <BookCard {...book}/> }
+                </div>
+                
+                {
+                    (recommendations.length > 0 || isLoadingRecommendations) &&
+                    <BookResults books={recommendations} loading={isLoadingRecommendations}/>
+                }
             </div>
-            
-            { (recommendations.length > 0 || isLoadingRecommendations) && <BookResults books={recommendations} loading={isLoadingRecommendations}/> }
+            <Footer />
         </React.Fragment>
     }
 }

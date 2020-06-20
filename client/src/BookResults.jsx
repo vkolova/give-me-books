@@ -3,7 +3,7 @@ import BookCard from './BookCard';
 import Loading from './Loading';
 
 const BookResults = props => {
-    return <div className='books-list'>
+    return <div className='half books-list'>
         {
             props.loading
             ? <div className='center'><Loading/></div>

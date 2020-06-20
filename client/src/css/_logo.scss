@@ -2,7 +2,7 @@
 @import '_mixins';
 
 
-.main {
+.site-title {
     @include flex-list;
     @include flex-center;
     @include print {
@@ -10,5 +10,4 @@
             display: none;
         }
     }
-    flex: 1;
 }

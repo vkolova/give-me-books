@@ -18,7 +18,7 @@ class Shelf extends React.Component {
 
 class Search extends React.Component {
     state = {
-        url: '',
+        url: 'https://www.goodreads.com/book/show/32758410-born-darkly',
         error: false,
         sendToEmail: false,
         email: '',
@@ -28,8 +28,8 @@ class Search extends React.Component {
         isLoading: false
     }
 
-    updateSearchCriteria = e => {
-        this.setState({ url: e.target.value });
+    handleInputChange = e => {
+        this.setState({ [e.target.name]: e.target.value });
     }
 
     getBookData = () => {
@@ -47,7 +47,8 @@ class Search extends React.Component {
         axios.get('http://localhost:8000/recommendation', {
             params: {
                 url: this.state.url,
-                shelves: this.state.selectedShelves.join(',')
+                shelves: this.state.selectedShelves.join(','),
+                ...(this.state.sendToEmail && this.state.email ? {email: this.state.email} : {})
             }
         })
         .then(({ data }) => this.props.app.setState({ recommendations: data.books }))
@@ -67,11 +68,11 @@ class Search extends React.Component {
 
     onCheckboxChange = e => {
         this.setState({ [e.target.name]: e.target.checked });
-        e.target.checked && this.state.url && this.loadShelves();
     }
 
     onSelectShelves = e => {
         this.onCheckboxChange(e);
+        e.target.checked && this.state.url && this.loadShelves();
     }
 
     selectShelf = shelf => {
@@ -89,21 +90,32 @@ class Search extends React.Component {
             <div className='search'>
                 <input
                     className='field'
+                    name='url'
                     type='text'
-                    onChange={this.updateSearchCriteria}
+                    onChange={this.handleInputChange}
                     value={this.state.url}
                 />
                 <div className='search-options'>
-                    {/* <label>
+                    <label>
                         <input type='checkbox' name='sendToEmail' value={sendToEmail} onChange={this.onCheckboxChange} />
                         Изпрати на мейла ми
-                    </label> */}
+                    </label>
 
                     <label>
                         <input type='checkbox' name='selectShelves' value={selectShelves} onChange={this.onSelectShelves} />
                         Искам да избера ключовите категории
                     </label>
                 </div>
+                {
+                    this.state.sendToEmail &&
+                        <input
+                            className='field'
+                            name='email'
+                            type='email'
+                            onChange={this.handleInputChange}
+                            value={this.state.email}
+                        />
+                }
                 <div className='shelves'>
                     {
                         this.state.allShelves.map(s =>

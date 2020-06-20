@@ -20,12 +20,15 @@ class BookCard extends React.Component {
             </div>
             <div className='right'>
                 <a className='title' href={url} target='_blank'>{title}</a>
+                <br />
                 {
                     Object.keys(authors).map(an =>
                         <a className='author' href={authors[an]} target='_blank'>{an}</a>
                     )
                 }
-                <p className='blurb'>{`${blurb.substring(0, 350)}...`}</p>
+                <p className='blurb'>
+                    {`${blurb.substring(0, 500)}...`}
+                </p>
             </div>
         </div>
     }

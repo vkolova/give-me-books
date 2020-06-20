@@ -9,14 +9,12 @@
 @import '_books-list';
 @import '_loading';
 @import '_header';
+@import '_footer';
 
 
 html,
 body {
-    @include flex-center;
-    margin: 0 auto;
-    height: 100%;
-    width: 100%;
+    margin: 0;
     
     line-height: 1.5;
     font-size: 16px;
@@ -25,46 +23,28 @@ body {
     background: $white;
 }
 
-a,
-a:hover,
-a:visited,
-a:focus,
-a:active {
-    color: #000000;
-    text-decoration: none;
-}
-
-#root {
-    @include flex-center;
-    @include sm {
-        @include flex-list;
-    }
-    @include md {
-        @include flex-list;
-    }
-    @include lg {
-        @include flex-row;
-        overflow: hidden;
-    }
-    @include xl {
-        @include flex-row;
-        overflow: hidden;
-    }
+html {
     height: 100%;
-    width: 100%;
-    // @include flex-list;
 }
 
-.main {
-    @include flex-list;
-    flex: 1;
+body {
+    min-height: 100%;
+}
+
+*, :after, :before {
+    box-sizing: border-box;
+}
+
+::selection {
+    background-color: rgba($primary, 0.5);
 }
 
 @include print {
     #root,
-    .main {
-        display: unset;
-        overflow: unset;
+    .main,
+    .content-wrapper {
+        display: unset !important;
+        overflow: unset !important;
     }
 
     .main {
@@ -72,5 +52,35 @@ a:active {
         .book-card .right .blurb {
             display: none;
         }
+    }
+}
+
+#root {
+    display: flex;
+    flex-flow: column wrap;
+}
+  
+#root > * {
+    width: 100%;
+}
+
+#root .content-wrapper {
+    @include scrollbars(5px, $primary);
+    @include sm {
+        overflow: auto;
+        flex-flow: row wrap;
+    }
+    flex: 1 0 0;
+    display: flex;
+    flex-flow: row;
+    overflow: hidden;
+
+    & > * {
+        flex: 1 50%;
+    }
+
+    .main {
+        @include flex-list;
+        @include flex-center;
     }
 }

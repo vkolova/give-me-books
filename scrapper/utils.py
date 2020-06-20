@@ -19,6 +19,9 @@ user_agent_rotator = UserAgent(software_names=software_names, operating_systems=
 flatten = lambda l: functools.reduce(operator.iconcat, l, [])
 unique = lambda l: list(set(l))
 
+def corr(s):
+    return re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
+
 def extract_book_preview(page):
     soup = BeautifulSoup(page.text, 'html.parser')
     data = {}
@@ -27,7 +30,7 @@ def extract_book_preview(page):
     data['authors'] = {a.text.strip(): a.attrs['href'] for a in soup.find_all('a', class_='authorName')}
     data['rating'] = soup.select('#bookMeta > span:nth-child(2)')[0].text.strip()
     data['cover'] = soup.find(id='coverImage').attrs['src']
-    data['blurb'] = soup.select('#description span')[0].text.strip()
+    data['blurb'] = corr(soup.select('#description span')[0].text)
     return data
 
 def paginate(url: str, pages: int) -> List[str]:

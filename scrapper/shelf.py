@@ -38,9 +38,7 @@ async def parse_shelves_page(page_url: str, executor: ThreadPoolExecutor) -> Lis
         partial(
             requests.get,
             page_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent()
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     return parse_shelf_urls(page.text)
@@ -53,9 +51,7 @@ async def parse_books_from_shelf(shelf_url: str, executor: ThreadPoolExecutor) -
         partial(
             requests.get,
             shelf_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent()
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     return parse_book_urls(page.text)
@@ -64,9 +60,7 @@ def parse_books_from_shelf_non_async(shelf_url: str, executor: ThreadPoolExecuto
     logging.debug(f"[SHLF] Requesting {shelf_url}")
     page = requests.get(
         shelf_url,
-        headers={
-            'User-Agent': user_agent_rotator.get_random_user_agent()
-        }
+        headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
     )
     return parse_book_urls(page.text)
 
@@ -79,9 +73,7 @@ async def get_shelves(shelves_page_url: str, executor: ThreadPoolExecutor) -> Li
         partial(
             requests.get,
             shelves_page_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent()
-            }
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
     )
     first_page_shelves = parse_shelf_urls(shelves_page.text)
