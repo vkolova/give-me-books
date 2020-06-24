@@ -5,13 +5,10 @@ from bs4 import BeautifulSoup, SoupStrainer
 from concurrent.futures import ThreadPoolExecutor
 import logging
 import requests
-import time
-import re
 from functools import partial
-from bs4 import BeautifulSoup
 
-from settings import GOODREADS_URL
-from utils import paginate, flatten, unique, user_agent_rotator, get_book_id
+from recommender.settings import GOODREADS_URL
+from recommender.utils import user_agent_rotator, get_book_id
 
 shelf_urls_only = SoupStrainer('a', {'class': 'mediumText actionLinkLite'})
 
@@ -29,6 +26,7 @@ filtered_keywords = [
     '2020-books', '2019-books', '2018-books', '2017-books', '2016-books', '2015-books'
 ]
 
+
 def filter_out_irrelevant(keywords: List[str]) -> List[str]:
     return [
         k
@@ -37,7 +35,10 @@ def filter_out_irrelevant(keywords: List[str]) -> List[str]:
     ]
 
 
-async def extract_book_data(book_url: str, executor: ThreadPoolExecutor) -> Dict[str, str]:
+async def extract_book_data(
+    book_url: str,
+    executor: ThreadPoolExecutor
+) -> Dict[str, str]:
     loop = asyncio.get_event_loop()
     book_id = get_book_id(book_url)
     shelves_page_url = f"{GOODREADS_URL}/book/shelves/{book_id}"
@@ -45,7 +46,8 @@ async def extract_book_data(book_url: str, executor: ThreadPoolExecutor) -> Dict
 
     page = await loop.run_in_executor(
         executor,
-        partial(requests.get,
+        partial(
+            requests.get,
             shelves_page_url,
             headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
         )
@@ -53,13 +55,22 @@ async def extract_book_data(book_url: str, executor: ThreadPoolExecutor) -> Dict
     soup = BeautifulSoup(page.text, 'lxml', parse_only=shelf_urls_only)
     return {
         'url': book_url,
-        'keywords': ' '.join(filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')]) or ['none'])
+        'keywords': ' '.join(
+            filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')])
+            or ['none']
+        )
     }
 
 
-async def gather_book_data(book_urls: List[str], executor: ThreadPoolExecutor) -> List[Dict[str, str]]:
+async def gather_book_data(
+    book_urls: List[str],
+    executor: ThreadPoolExecutor
+) -> List[Dict[str, str]]:
     done, _ = await asyncio.wait(
-        [extract_book_data(f"{GOODREADS_URL}{url}", executor) for url in book_urls],
+        [
+            extract_book_data(f"{GOODREADS_URL}{url}", executor)
+            for url in book_urls
+        ],
         return_when=asyncio.ALL_COMPLETED
     )
     return [t.result() for t in done]

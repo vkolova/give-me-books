@@ -49,3 +49,16 @@ h1 {
     align-items: center;
     justify-content: center;
 }
+
+.a-btn {
+    color: $primary;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.a-btn,
+.a-btn:hover {
+    margin: 0 5px;
+    color: $primary;
+    text-decoration: underline;
+}

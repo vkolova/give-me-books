@@ -61,11 +61,20 @@ class Search extends React.Component {
         axios.get('http://localhost:8000/recommendation', {
             params: {
                 url: this.state.url,
-                shelves: this.state.selectedShelves.join(','),
-                ...(this.state.sendToEmail && this.state.email ? { email: this.state.email } : {})
+                ...(
+                    this.state.selectShelves &&
+                    this.state.selectedShelves.length > 0
+                        ? { shelves: this.state.selectedShelves.join(',') }
+                        : {}
+                )
             }
         })
-            .then(({ data }) => this.props.app.setState({ recommendations: data.books }))
+            .then(({ data }) =>
+                this.props.app.setState({
+                    recommendations: data.books,
+                    searchID: data.search_id
+                })
+            )
             .catch(err => console.log(err))
             .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
     }
@@ -98,7 +107,7 @@ class Search extends React.Component {
     }
 
     render () {
-        const { isLoading, sendToEmail, selectShelves } = this.state;
+        const { isLoading, selectShelves } = this.state;
 
         return <React.Fragment>
             <div className='search'>
@@ -110,11 +119,6 @@ class Search extends React.Component {
                     value={this.state.url}
                 />
                 <div className='search-options'>
-                    <label>
-                        <input type='checkbox' name='sendToEmail' value={sendToEmail} onChange={this.onCheckboxChange} />
-                        Изпрати на мейла ми
-                    </label>
-
                     <label>
                         <input type='checkbox' name='selectShelves' value={selectShelves} onChange={this.onSelectShelves} />
                         Искам да избера ключовите категории

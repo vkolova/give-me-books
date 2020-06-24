@@ -3,8 +3,11 @@ import functools
 import operator
 import re
 import random
+import asyncio
+import logging
+from functools import partial
 
-from typing import List
+from typing import List, Dict
 from bs4 import BeautifulSoup, SoupStrainer
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
@@ -19,8 +22,10 @@ user_agent_rotator = UserAgent(software_names=software_names, operating_systems=
 flatten = lambda l: functools.reduce(operator.iconcat, l, [])
 unique = lambda l: list(set(l))
 
+
 def corr(s):
     return re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
+
 
 def extract_book_preview(page):
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -44,3 +49,21 @@ def paginate(url: str, pages: int) -> List[str]:
 
 def get_book_id(url: str) -> str:
     return re.findall(book_id_regex, url)[3][0]
+
+
+def filter_out_dublicates(books: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    return list({v['title']:v for v in books}.values()) 
+
+
+async def get_book_preview(link: str, executor) -> Dict[str, str]:
+    loop = asyncio.get_event_loop()
+    logging.debug(f"[MAIN] Requesting {link}")
+    page = await loop.run_in_executor(
+        executor,
+        partial(
+            requests.get,
+            link,
+            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
+        )
+    )
+    return extract_book_preview(page)

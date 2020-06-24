@@ -13,7 +13,8 @@ class App extends React.Component {
     state = {
         book: null,
         isLoadingRecommendations: false,
-        recommendations: []
+        recommendations: [],
+        searchID: null
     }
 
     render () {
@@ -32,7 +33,7 @@ class App extends React.Component {
                     <BookResults books={recommendations} loading={isLoadingRecommendations}/>
                 }
             </div>
-            <Footer />
+            <Footer canSave={recommendations.length > 0} searchID={this.state.searchID}/>
         </React.Fragment>;
     }
 }

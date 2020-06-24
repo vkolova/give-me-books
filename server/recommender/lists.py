@@ -5,12 +5,17 @@ from bs4 import BeautifulSoup, SoupStrainer
 from concurrent.futures import ThreadPoolExecutor
 import logging
 import requests
-import time
 import re
 from functools import partial
 
-from settings import GOODREADS_URL, LISTS_PARSE_FIRST_PAGE_ONLY, LISTS_PARSE_PAGE_COUNT, PARSE_LIST_FIST_PAGE_ONLY, LIST_PAGES_TO_PARSE
-from utils import paginate, flatten, unique, user_agent_rotator
+from recommender.settings import (
+    GOODREADS_URL,
+    LISTS_PARSE_FIRST_PAGE_ONLY,
+    LISTS_PARSE_PAGE_COUNT,
+    PARSE_LIST_FIST_PAGE_ONLY,
+    LIST_PAGES_TO_PARSE
+)
+from recommender.utils import paginate, flatten, unique, user_agent_rotator
 
 list_url_regex = re.compile(r"^(.*?)\..*")
 list_titles_only = SoupStrainer('a', {'class': 'listTitle'})
@@ -22,6 +27,7 @@ pagination_div = SoupStrainer('div', {'class': 'pagination'})
 def parse_pages_number(text: str) -> List[str]:
     soup = BeautifulSoup(text, 'lxml', parse_only=div_left_container)
     return soup.select('div.leftContainer > div > a')[-2].text
+
 
 def parse_list_pages_number(text: str) -> List[str]:
     soup = BeautifulSoup(text, 'lxml', parse_only=pagination_div)
@@ -35,7 +41,10 @@ def parse_list_urls(text: str) -> List[str]:
 
 
 def prep_lists_urls(urls: List[str]) -> List[str]:
-    return [f"{GOODREADS_URL}{re.search(list_url_regex, url).group(1)}" for url in urls]
+    return [
+        f"{GOODREADS_URL}{re.search(list_url_regex, url).group(1)}"
+        for url in urls
+    ]
 
 
 def parse_book_urls(text: str) -> List[str]:
@@ -43,7 +52,10 @@ def parse_book_urls(text: str) -> List[str]:
     return [l.get('href') for l in soup.find_all('a')]
 
 
-async def parse_lists_page(page_url: str, executor: ThreadPoolExecutor) -> List[str]:
+async def parse_lists_page(
+    page_url: str,
+    executor: ThreadPoolExecutor
+) -> List[str]:
     logging.debug(f"[LIST] Requesting {page_url}")
     loop = asyncio.get_event_loop()
     page = await loop.run_in_executor(
@@ -57,7 +69,10 @@ async def parse_lists_page(page_url: str, executor: ThreadPoolExecutor) -> List[
     return parse_list_urls(page.text)
 
 
-async def get_lists(lists_page_url: str, executor: ThreadPoolExecutor) -> List[str]:
+async def get_lists(
+    lists_page_url: str,
+    executor: ThreadPoolExecutor
+) -> List[str]:
     logging.debug(f"[LIST] Requesting {lists_page_url}")
     loop = asyncio.get_event_loop()
     lists_page = await loop.run_in_executor(
@@ -72,7 +87,7 @@ async def get_lists(lists_page_url: str, executor: ThreadPoolExecutor) -> List[s
 
     if LISTS_PARSE_FIRST_PAGE_ONLY:
         return first_page_lists, []
-  
+
     try:
         pages = parse_pages_number(lists_page.text)
         iterate_pages_count = min(int(pages), LISTS_PARSE_PAGE_COUNT)
@@ -84,7 +99,10 @@ async def get_lists(lists_page_url: str, executor: ThreadPoolExecutor) -> List[s
         return first_page_lists, []
 
 
-async def parse_books_from_list(list_url: str, executor: ThreadPoolExecutor) -> List[str]:
+async def parse_books_from_list(
+    list_url: str,
+    executor: ThreadPoolExecutor
+) -> List[str]:
     logging.debug(f"[LIST] Requesting {list_url}")
     loop = asyncio.get_event_loop()
     page = await loop.run_in_executor(
@@ -106,7 +124,10 @@ async def parse_books_from_list(list_url: str, executor: ThreadPoolExecutor) -> 
     return first_page_books, []
 
 
-async def parse_book_urls_from_list_page(list_url: str, executor: ThreadPoolExecutor) -> List[str]:
+async def parse_book_urls_from_list_page(
+    list_url: str,
+    executor: ThreadPoolExecutor
+) -> List[str]:
     logging.debug(f"[LIST] Requesting {list_url}")
     loop = asyncio.get_event_loop()
     page = await loop.run_in_executor(
@@ -122,7 +143,11 @@ async def parse_book_urls_from_list_page(list_url: str, executor: ThreadPoolExec
     )
     return parse_book_urls(page.text)
 
-async def gather_lists_urls(lists_page_url: str, executor: ThreadPoolExecutor) -> List[str]:
+
+async def gather_lists_urls(
+    lists_page_url: str,
+    executor: ThreadPoolExecutor
+) -> List[str]:
     lists, lists_pages = await get_lists(lists_page_url, executor)
     if lists_pages:
         done, _ = await asyncio.wait(
@@ -133,7 +158,10 @@ async def gather_lists_urls(lists_page_url: str, executor: ThreadPoolExecutor) -
     return lists
 
 
-async def gather_books_from_lists(lists_urls: List[str], executor: ThreadPoolExecutor) -> List[str]:
+async def gather_books_from_lists(
+    lists_urls: List[str],
+    executor: ThreadPoolExecutor
+) -> List[str]:
     urls = prep_lists_urls(lists_urls)
     done, _ = await asyncio.wait(
         [parse_books_from_list(s, executor) for s in urls],
