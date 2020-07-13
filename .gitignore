@@ -12,3 +12,5 @@ server/*.sqlite*
 
 *.txt
 **.egg*
+
+.vscode

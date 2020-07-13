@@ -32,7 +32,11 @@ Shelf.propTypes = {
 class Search extends React.Component {
     state = {
         url: '',
-        error: false,
+        errors: {
+            general: null,
+            url: null,
+            shelves: null
+        },
         sendToEmail: false,
         email: '',
         selectShelves: false,
@@ -42,10 +46,21 @@ class Search extends React.Component {
     }
 
     handleInputChange = e => {
-        this.setState({ [e.target.name]: e.target.value });
+        this.setState(
+            { [e.target.name]: e.target.value },
+            () => {
+                (this.state.url === '' || !this.state.url.includes('goodreads'))
+                    ? this.setState({
+                        errors: { ...this.state.errors, url: 'Моля, въведете линк към книга в Goodreads' }
+                    })
+                    : this.setState({
+                        errors: { ...this.state.errors, url: null }
+                    });
+            }
+        );
     }
 
-    getBookData = () => {
+    search = () => {
         this.setState({ isLoading: true });
         this.props.app.setState({ isLoadingRecommendations: true });
 
@@ -55,7 +70,14 @@ class Search extends React.Component {
             }
         })
             .then(({ data }) => this.props.app.setState({ book: data }))
-            .catch(err => this.setState({ error: true }))
+            .catch(err =>
+                this.setState({
+                    errors: {
+                        ...this.state.errors,
+                        general: 'О, не! Възникна неочаквана грешка! Моля, обновете страницата и опитайте отново.'
+                    }
+                })
+            )
             .then(() => this.setState({ isLoading: false }));
 
         axios.get('http://localhost:8000/recommendation', {
@@ -75,7 +97,14 @@ class Search extends React.Component {
                     searchID: data.search_id
                 })
             )
-            .catch(err => console.log(err))
+            .catch(err => {
+                this.setState({
+                    errors: {
+                        ...this.state.errors,
+                        general: 'О, не! Възникна неочаквана грешка! Моля, обновете страницата и опитайте отново.'
+                    }
+                });
+            })
             .then(() => this.props.app.setState({ isLoadingRecommendations: false }));
     }
 
@@ -86,7 +115,14 @@ class Search extends React.Component {
             }
         })
             .then(({ data }) => this.setState({ allShelves: data.shelves }))
-            .catch(err => console.log(err));
+            .catch(err =>
+                this.setState({
+                    errors: {
+                        ...this.state.errors,
+                        general: 'О, не! Възникна неочаквана грешка! Моля, обновете страницата и опитайте отново.'
+                    }
+                })
+            );
     }
 
     onCheckboxChange = e => {
@@ -99,15 +135,32 @@ class Search extends React.Component {
     }
 
     selectShelf = shelf => {
-        this.setState({ selectedShelves: [shelf, ...this.state.selectedShelves] });
+        this.setState(
+            { selectedShelves: [shelf, ...this.state.selectedShelves] },
+            () => {
+                this.state.selectedShelves.length > 5 &&
+                this.setState({
+                    errors: { ...this.state.errors, shelves: 'Моля, изберете максикум до 5 рафта' }
+                });
+            }
+        );
     }
 
     deselectShelf = shelf => {
-        this.setState({ selectedShelves: this.state.selectedShelves.filter(s => s !== shelf) });
+        this.setState(
+            { selectedShelves: this.state.selectedShelves.filter(s => s !== shelf) },
+            () => {
+                this.state.selectedShelves.length > 5 &&
+                this.setState({
+                    errors: { ...this.state.errors, shelves: null }
+                });
+            }
+        );
     }
 
     render () {
-        const { isLoading, selectShelves } = this.state;
+        const { isLoading, selectShelves, errors } = this.state;
+        const hasErrors = Object.values(errors).some(v => v);
 
         return <React.Fragment>
             <div className='search'>
@@ -150,13 +203,22 @@ class Search extends React.Component {
                 {
                     isLoading
                         ? <div className='btn'><Loading color='white' scale={0.2} /></div>
-                        : <div className='btn' onClick={this.getBookData}>Търси</div>
+                        : <div
+                            className={`btn ${hasErrors ? 'disabled' : ''}`}
+                            onClick={hasErrors ? null : this.search}
+                        >Търси</div>
                 }
             </div>
             {
-                this.state.error
+                hasErrors
                     ? <div className='error-message'>
-                        О, не! Възникна грешка. Въвел ли си валиден линк?
+                        {
+                            Object.keys(errors).map((e, i) =>
+                                <React.Fragment key={i}>
+                                    <span>{errors[e]}</span>
+                                </React.Fragment>
+                            )
+                        }
                     </div>
                     : <div style={{ height: '25px' }}/>
             }

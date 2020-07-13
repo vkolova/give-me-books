@@ -7,6 +7,7 @@ import logging
 import requests
 import re
 from functools import partial
+import sqlite3
 
 from recommender.settings import (
     GOODREADS_URL,
@@ -15,7 +16,7 @@ from recommender.settings import (
     PARSE_LIST_FIST_PAGE_ONLY,
     LIST_PAGES_TO_PARSE
 )
-from recommender.utils import paginate, flatten, unique, user_agent_rotator
+from recommender.utils import paginate, flatten, unique
 
 list_url_regex = re.compile(r"^(.*?)\..*")
 list_titles_only = SoupStrainer('a', {'class': 'listTitle'})
@@ -26,7 +27,10 @@ pagination_div = SoupStrainer('div', {'class': 'pagination'})
 
 def parse_pages_number(text: str) -> List[str]:
     soup = BeautifulSoup(text, 'lxml', parse_only=div_left_container)
-    return soup.select('div.leftContainer > div > a')[-2].text
+    try:
+        return soup.select('div.leftContainer > div > a')[-2].text
+    except IndexError:
+        return '1'
 
 
 def parse_list_pages_number(text: str) -> List[str]:
@@ -58,14 +62,16 @@ async def parse_lists_page(
 ) -> List[str]:
     logging.debug(f"[LIST] Requesting {page_url}")
     loop = asyncio.get_event_loop()
-    page = await loop.run_in_executor(
-        executor,
-        partial(
-            requests.get,
-            page_url,
-            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
+    try:
+        page = await loop.run_in_executor(
+            executor,
+            partial(
+                requests.get,
+                page_url
+            )
         )
-    )
+    except sqlite3.OperationalError:
+        pass
     return parse_list_urls(page.text)
 
 
@@ -79,8 +85,7 @@ async def get_lists(
         executor,
         partial(
             requests.get,
-            lists_page_url,
-            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
+            lists_page_url
         )
     )
     first_page_lists = parse_list_urls(lists_page.text)
@@ -90,16 +95,16 @@ async def get_lists(
 
     try:
         pages = parse_pages_number(lists_page.text)
-        iterate_pages_count = min(int(pages), LISTS_PARSE_PAGE_COUNT)
-        logging.debug(f"[LIST] Iterating over {iterate_pages_count} lists pages")
-        lists_pages = paginate(lists_page_url, iterate_pages_count)
+        page_count = min(int(pages), LISTS_PARSE_PAGE_COUNT)
+        logging.debug(f"[LIST] Iterating over {page_count} lists pages")
+        lists_pages = paginate(lists_page_url, page_count)
         return first_page_lists, lists_pages
     except Exception:
         logging.error("[LIST]", exc_info=True)
         return first_page_lists, []
 
 
-async def parse_books_from_list(
+async def parse_list_first_page(
     list_url: str,
     executor: ThreadPoolExecutor
 ) -> List[str]:
@@ -109,8 +114,7 @@ async def parse_books_from_list(
         executor,
         partial(
             requests.get,
-            list_url,
-            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
+            list_url
         )
     )
     first_page_books = parse_book_urls(page.text)
@@ -134,11 +138,7 @@ async def parse_book_urls_from_list_page(
         executor,
         partial(
             requests.get,
-            list_url,
-            headers={
-                'User-Agent': user_agent_rotator.get_random_user_agent(),
-                'Referer': 'https://goodreads.com'
-            }
+            list_url
         )
     )
     return parse_book_urls(page.text)
@@ -164,7 +164,7 @@ async def gather_books_from_lists(
 ) -> List[str]:
     urls = prep_lists_urls(lists_urls)
     done, _ = await asyncio.wait(
-        [parse_books_from_list(s, executor) for s in urls],
+        [parse_list_first_page(s, executor) for s in urls],
         return_when=asyncio.ALL_COMPLETED
     )
     books, lists_pages = zip(*[t.result() for t in done])
@@ -172,7 +172,10 @@ async def gather_books_from_lists(
     pages_urls = flatten(lists_pages)
     if pages_urls:
         done, _ = await asyncio.wait(
-            [parse_book_urls_from_list_page(s, executor) for s in pages_urls],
+            [
+                parse_book_urls_from_list_page(s, executor)
+                for s in pages_urls
+            ],
             return_when=asyncio.ALL_COMPLETED
         )
         books.extend([t.result() for t in done])

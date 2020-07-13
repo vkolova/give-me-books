@@ -6,24 +6,33 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import requests
 from functools import partial
+import sqlite3
 
 from recommender.settings import GOODREADS_URL
-from recommender.utils import user_agent_rotator, get_book_id
+from recommender.utils import get_book_id
 
 shelf_urls_only = SoupStrainer('a', {'class': 'mediumText actionLinkLite'})
 
 filtered_keywords = [
-    'to-read', 'tbr', 'currently-reading', 'favorites', 'to-re-read', 'reread', 're-read', 'own-unread', 'arc', 'arcs',
+    'to-read', 'tbr', 'currently-reading', 'favorites', 'to-re-read', 'reread',
+    're-read', 'own-unread', 'arc', 'arcs',
     'dnf', 'did-not-finish', 'nope', 'lost-interest', 'maybe',
     'kindle-unlimited', 'ku', 'audio', 'ebooks', 'kindle', 'unlimited',
-    'wishlist', 'to-buy', 'my-books', 'my-ebooks', 'my-library', 'library', 'owned-books', 'own-it', 'i-own', 'all-time-favorites', 'library',
+    'wishlist', 'to-buy', 'my-books', 'my-ebooks', 'my-library', 'library',
+    'owned-books', 'own-it', 'i-own', 'all-time-favorites', 'library',
     'debut', 'novels',
     'favourites',
     '5-stars', '4-stars', '3-stars', '2-stars',
-    '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020',
-    'read-in-2010', 'read-in-2011', 'read-in-2012', 'read-in-2013', 'read-in-2014', 'read-in-2015', 'read-in-2016', 'read-in-2017', 'read-in-2018', 'read-in-2019', 'read-in-2020',
-    'read-2010', 'read-2011', 'read-2012', 'read-2013', 'read-2014', 'read-2015', 'read-2016', 'read-2017', 'read-2018', 'read-2019', 'read-2020',
-    '2020-books', '2019-books', '2018-books', '2017-books', '2016-books', '2015-books'
+    '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018',
+    '2019', '2020',
+    'read-in-2010', 'read-in-2011', 'read-in-2012', 'read-in-2013',
+    'read-in-2014', 'read-in-2015', 'read-in-2016', 'read-in-2017',
+    'read-in-2018', 'read-in-2019', 'read-in-2020',
+    'read-2010', 'read-2011', 'read-2012', 'read-2013', 'read-2014',
+    'read-2015', 'read-2016', 'read-2017', 'read-2018', 'read-2019',
+    'read-2020',
+    '2020-books', '2019-books', '2018-books', '2017-books', '2016-books',
+    '2015-books'
 ]
 
 
@@ -44,15 +53,17 @@ async def extract_book_data(
     shelves_page_url = f"{GOODREADS_URL}/book/shelves/{book_id}"
     logging.debug(f"[BOOK] Requesting {shelves_page_url}")
 
-    page = await loop.run_in_executor(
-        executor,
-        partial(
-            requests.get,
-            shelves_page_url,
-            headers={'User-Agent': user_agent_rotator.get_random_user_agent()}
+    try:
+        page = await loop.run_in_executor(
+            executor,
+            partial(
+                requests.get,
+                shelves_page_url
+            )
         )
-    )
-    soup = BeautifulSoup(page.text, 'lxml', parse_only=shelf_urls_only)
+        soup = BeautifulSoup(page.text, 'lxml', parse_only=shelf_urls_only)
+    except sqlite3.OperationalError:
+        pass
     return {
         'url': book_url,
         'keywords': ' '.join(

@@ -27,11 +27,18 @@ h1 {
     color: $white;
     background-color: $primary;
     transition: background-color 0.4s ease-in-out;
+    user-select: none;
     cursor: pointer;
 
     &:hover {
         background-color: rgba($primary, 0.7);
     }
+}
+
+.btn.disabled {
+    background-color: rgba($black, 0.3);
+    transition: background-color 0.4s ease-in-out;
+    cursor: not-allowed;
 }
 
 .error-message {

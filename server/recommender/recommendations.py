@@ -11,12 +11,7 @@ def generate_recommendations(
     rec_count: int = 10
 ) -> List[str]:
     ds = pd.read_csv(file_name)
-    tf = TfidfVectorizer(
-        analyzer='word',
-        ngram_range=(1, 3),
-        min_df=0,
-        stop_words='english'
-    )
+    tf = TfidfVectorizer()
     tfidf_matrix = tf.fit_transform(ds['keywords'])
 
     cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
