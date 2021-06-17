@@ -1,0 +1,9 @@
+
+-e .
+beautifulsoup4==4.9.3
+lxml==4.6.3
+pandas==1.2.4
+requests-cache==0.6.4
+requests==2.25.1
+sanic==21.3.4
+scikit-learn==0.24.2

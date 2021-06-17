@@ -10,7 +10,6 @@ server/*.sqlite*
 */__pycache__
 *.pyc
 
-*.txt
 **.egg*
 
 .vscode
