@@ -1,0 +1,24 @@
+version: '3'
+networks:
+  default:
+    external:
+      name: gmi
+services:
+  server:
+    build:
+      context: .
+    environment:
+      SENDER_EMAIL: "${SENDER_EMAIL}"
+      SENDER_EMAIL_PASS: "${SENDER_EMAIL_PASS}"
+    ports:
+     - "8000:8000"
+    command: bash -c "cd server && python main.py"
+
+  ui:
+    build:
+      context: .
+    ports:
+     - "3000:3000"
+    depends_on:
+      - server
+    command: bash -c "cd client && npm start"

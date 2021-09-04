@@ -22,22 +22,25 @@ def corr(s):
 
 
 def extract_book_preview(page):
-    soup = BeautifulSoup(page.text, 'lxml')
-    series = soup.select('#bookSeries > a')
-    return {
-        'url': page.url,
-        'title': soup.find(id='bookTitle').text.strip(),
-        'series': {
-            'title': series[0].text.strip(),
-            'url': f"{GOODREADS_URL}{series[0].attrs['href']}"
-        } if len(series) else None,
-        'authors': {
-            a.text.strip(): a.attrs['href']
-            for a in soup.find_all('a', class_='authorName')
-        },
-        'cover':  soup.find(id='coverImage').attrs['src'],
-        'blurb': corr(soup.select('#description span')[0].text)
-    }
+    try:
+        soup = BeautifulSoup(page.text, 'lxml')
+        series = soup.select('#bookSeries > a')
+        return {
+            'url': page.url,
+            'title': soup.find(id='bookTitle').text.strip(),
+            'series': {
+                'title': series[0].text.strip(),
+                'url': f"{GOODREADS_URL}{series[0].attrs['href']}"
+            } if len(series) else None,
+            'authors': {
+                a.text.strip(): a.attrs['href']
+                for a in soup.find_all('a', class_='authorName')
+            },
+            'cover':  soup.find(id='coverImage').attrs['src'],
+            'blurb': corr(soup.select('#description span')[0].text)
+        }
+    except AttributeError:
+        return None
 
 
 def paginate(url: str, pages: int) -> List[str]:

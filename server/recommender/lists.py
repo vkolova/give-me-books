@@ -70,9 +70,9 @@ async def parse_lists_page(
                 page_url
             )
         )
+        return parse_list_urls(page.text)
     except sqlite3.OperationalError:
-        pass
-    return parse_list_urls(page.text)
+        return []
 
 
 async def get_lists(

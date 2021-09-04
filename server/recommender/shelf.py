@@ -53,6 +53,7 @@ async def parse_shelves_page(
 ) -> List[str]:
     logging.debug(f"[SHLF] Requesting {page_url}")
     loop = asyncio.get_event_loop()
+
     try:
         page = await loop.run_in_executor(
             executor,
@@ -61,9 +62,9 @@ async def parse_shelves_page(
                 page_url
             )
         )
-    except sqlite3.OperationalError:
-        pass
-    return parse_shelf_urls(page.text)
+        return parse_shelf_urls(page.text)
+    except sqlite3.OperationalErro:
+        return []
 
 
 async def parse_book_urls_from_shelf(
@@ -80,9 +81,9 @@ async def parse_book_urls_from_shelf(
                 shelf_url
             )
         )
-    except sqlite3.OperationalError:
-        pass
-    return parse_book_urls(page.text)
+        return parse_book_urls(page.text)
+    except sqlite3.OperationalErro:
+        return []
 
 
 async def get_shelves(
@@ -99,12 +100,12 @@ async def get_shelves(
                 shelves_page_url
             )
         )
-    except sqlite3.OperationalError:
-        pass
-    first_page_shelves = parse_shelf_urls(shelves_page.text)
+        first_page_shelves = parse_shelf_urls(shelves_page.text)
 
-    if SHELVES_LOAD_FIRST_PAGE_ONLY:
-        return first_page_shelves, []
+        if SHELVES_LOAD_FIRST_PAGE_ONLY:
+            return first_page_shelves, []
+    except sqlite3.OperationalError:
+        return [], []
 
     try:
         pages = parse_pages_number(shelves_page.text)
@@ -157,14 +158,14 @@ async def parse_shelves_from_shelves(
                 shelves_url
             )
         )
+        first_page_books = parse_shelf_urls(page.text)
+        pages = parse_shelves_pages_number(page.text)
+        if pages:
+            iterate_pages_count = int(pages)
+            return first_page_books, paginate(shelves_url, iterate_pages_count)
+        return first_page_books, []
     except sqlite3.OperationalError:
-        pass
-    first_page_books = parse_shelf_urls(page.text)
-    pages = parse_shelves_pages_number(page.text)
-    if pages:
-        iterate_pages_count = int(pages)
-        return first_page_books, paginate(shelves_url, iterate_pages_count)
-    return first_page_books, []
+        return [], []
 
 
 async def parse_shelves_urls_from_shelves_page(
@@ -181,9 +182,9 @@ async def parse_shelves_urls_from_shelves_page(
                 list_url
             )
         )
+        return parse_shelf_urls(page.text)
     except sqlite3.OperationalError:
-        pass
-    return parse_shelf_urls(page.text)
+        return []
 
 
 async def gather_shelves_from_shelves(

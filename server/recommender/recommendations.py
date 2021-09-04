@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import linear_kernel
 def generate_recommendations(
     target: str,
     file_name: str,
-    rec_count: int = 10
+    rec_count: int = 11
 ) -> List[str]:
     ds = pd.read_csv(file_name)
     tf = TfidfVectorizer()

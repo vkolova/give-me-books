@@ -62,15 +62,17 @@ async def extract_book_data(
             )
         )
         soup = BeautifulSoup(page.text, 'lxml', parse_only=shelf_urls_only)
+        return {
+            'url': book_url,
+            'keywords': ' '.join(
+                filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')])
+                or ['none']
+            )
+        }
     except sqlite3.OperationalError:
         pass
-    return {
-        'url': book_url,
-        'keywords': ' '.join(
-            filter_out_irrelevant([l.text for l in soup if hasattr(l, 'text')])
-            or ['none']
-        )
-    }
+
+    return {'url': book_url, 'keywords': ['none']}
 
 
 async def gather_book_data(

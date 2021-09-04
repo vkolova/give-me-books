@@ -50,7 +50,8 @@ async def book_results_preview(
         [get_book_preview(url, executor) for url in urls],
         return_when=asyncio.ALL_COMPLETED
     )
-    return filter_out_dublicates([t.result() for t in done])[:10]
+    results = [t.result() for t in done]
+    return filter_out_dublicates([r for r in results if r])[:10]
 
 
 @app.route("/preview", methods=['GET'])

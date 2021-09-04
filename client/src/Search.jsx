@@ -1,8 +1,16 @@
+import axios from 'axios';
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+import http from 'http';
+import https from 'https';
 
 import Loading from './Loading';
+
+const TIMEOUT = 1000 * 60 * 2;
+
+axios.defaults.timeout = TIMEOUT;
+axios.defaults.httpAgent = new http.Agent({ timeout: TIMEOUT })
+axios.defaults.httpsAgent = new https.Agent({ timeout: TIMEOUT })
 
 class Shelf extends React.Component {
     handleClick = () => {
